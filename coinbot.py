@@ -20,17 +20,17 @@ def create_new_user(chatid:int, msgID:int, name:str, sec_name:str = None, userna
 def save_users():
     global users
     # print("Saving users...")
-    with open(r".\accounts.json" , "w") as file :
+    with open(r".\accounts.json" , "w") as file:
         file.write(json.dumps(users))
 
 
 def load_users():
     global users
     # print("Loading users...")
-    if os.path.isfile(r".\accounts.json") :
-        with open(r".\accounts.json" , "r") as file :
+    if os.path.isfile(r".\accounts.json"):
+        with open(r".\accounts.json" , "r") as file:
             users = json.loads(file.read())
-    else :
+    else:
         users = {}
 
 
@@ -86,7 +86,7 @@ def chat_handle(msg):
                 surname = None
 
             create_new_user(chatid, msg_id["message_id"], msg["from"]["first_name"], surname, username)
-    finally :
+    finally:
         # saveUsers()
         print("", end='')
 
@@ -100,25 +100,27 @@ def callback_handle(msg):
     # loadUsers()
     try :
         action = random.randint(0, 99999)
-        id, from_id, data = telepot.glance(msg, flavor="callback_query")
+        callback_id, from_id, data = telepot.glance(msg, flavor="callback_query")
         from_id = str(from_id)
-        if data == "profile" :
+        if data == "profile":
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="↩ Torna al menu" , callback_data="menu")]
             ])
-            #print(users[from_id]["msg"])
+            # print(users[from_id]["msg"])
             message = ""
             message+="***Profilo di: " + users[from_id]["name"] + "***\n"
             message+="👱" + "Name: " + users[from_id]["name"] + "\n"
-            if users[from_id]["second_name"] != None: message+="👪" + " Second Name: " + users[from_id]["second_name"] + "\n"
-            if users[from_id]["username"] != None: message+="🌐" + " Username: " + users[from_id]["username"] + "\n"
-            message+=emoji.EMOJI_ALIAS_UNICODE[":credit_card:"] + " Money: " + str(users[from_id]["money"]) + "💎"
+            if users[from_id]["second_name"] is not None: message += "👪" + " Second Name: " \
+                                                                     + users[from_id]["second_name"] + "\n"
+            if users[from_id]["username"] is not None: message += "🌐" + " Username: " + \
+                                                                  users[from_id]["username"] + "\n"
+            message += emoji.EMOJI_ALIAS_UNICODE[":credit_card:"] + " Money: " + str(users[from_id]["money"]) + "💎"
             bot.editMessageText((from_id, users[from_id]["msg"]),
                                 message,
                                 reply_markup=keyboard, parse_mode="Markdown")
             return
 
-        if data == "menu" :
+        if data == "menu":
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="🕹 Gioca! 🕹", callback_data="play")],
                 [InlineKeyboardButton(text="👾 Profilo 👾", callback_data="profile"),
@@ -203,18 +205,18 @@ def callback_handle(msg):
             if (ai == 1 and ogg == "forb") or (ai == 2 and ogg == "rock") and (ai == 3 and ogg == "paper") :
                 text = "***Hai Perso!***"
 
-            if ai == 1 :
+            if ai == 1:
                 aiobj = "Sasso"
-            if ai == 2 :
+            if ai == 2:
                 aiobj = "Carta"
-            if ai == 3 :
+            if ai == 3:
                 aiobj = "Forbice"
 
-            if ogg == "rock" :
+            if ogg == "rock":
                 plobj = "Sasso"
-            if ogg == "paper" :
+            if ogg == "paper":
                 plobj = "Carta"
-            if ogg == "forb" :
+            if ogg == "forb":
                 plobj = "Forbice"
 
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -225,16 +227,15 @@ def callback_handle(msg):
             ])
 
             bot.editMessageText((from_id, users[from_id]["msg"]),
-                                "Match N° " + str(count) + "\n\nMossa dell'utente: " + plobj + "\nMossa del computer: " + aiobj + "\n" + text,
+                                "Match N° " + str(count) + "\n\nMossa dell'utente: " + plobj
+                                + "\nMossa del computer: " + aiobj + "\n" + text,
                                 parse_mode='Markdown',
                                 reply_markup=keyboard)
 
             users[from_id]["money"]+=points
             return
 
-
-
-        if data == "gev" :
+        if data == "gev":
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Gratta!", callback_data="geva")],
                 [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
@@ -246,27 +247,26 @@ def callback_handle(msg):
                                 parse_mode="Markdown")
             return
 
-        if data == "geva" :
+        if data == "geva":
             n1 = random.randint(0,10)
             n2 = random.randint(0, 10)
-            isValid = ""
             add = 0
-            if n1 == n2 :
-                isValid = "I numeri sono identici!\n___5 punti sono stati aggiunti al tuo conto___"
+            if n1 == n2:
+                is_valid = "I numeri sono identici!\n___5 punti sono stati aggiunti al tuo conto___"
                 add = 5
-            else :
-                isValid = "Mi dispiace, i numeri sono diversi."
+            else:
+                is_valid = "Mi dispiace, i numeri sono diversi."
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Gratta!", callback_data="geva")],
                 [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
             bot.editMessageText((from_id, users[from_id]["msg"]),
-                                "Numero 1: " + str(n1) + "\n" \
-                                "Numero 2: " + str(n2) + "\n" \
-                                + isValid,
+                                "Numero 1: " + str(n1) + "\n"
+                                "Numero 2: " + str(n2) + "\n"
+                                + is_valid,
                                 reply_markup=keyboard,
                                 parse_mode="Markdown")
-            users[from_id]["money"]+=add
+            users[from_id]["money"] += add
             return
 
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -278,43 +278,43 @@ def callback_handle(msg):
                             parse_mode="Markdown")
 
         return
-    finally :
-        #saveUsers()
-        print("" , end='')
+    finally:
+        # saveUsers()
+        print("", end='')
 
 
-def inline_handle(msg) :
+def inline_handle(msg):
     global action
     global users
-    #loadUsers()
-    try :
+    # loadUsers()
+    try:
         action = random.randint(0, 99999)
         return
-    finally :
-        #saveUsers()
-        print("" , end='')
+    finally:
+        # saveUsers()
+        print("", end='')
 
 
-def handle(msg) :
+def handle(msg):
     global users
     load_users()
     try :
         f = telepot.flavor(msg)
-        if f == "chat" :
+        if f == "chat":
             chat_handle(msg)
-        if f == "callback_query" :
+        if f == "callback_query":
             callback_handle(msg)
-        if f == "inline_query" :
+        if f == "inline_query":
             inline_handle(msg)
-    finally :
+    finally:
         save_users()
 
 
-#print(users)
-#route = {"chat" : chatHandle , "callback_query" : callbackHandle , "inline_query" : inlineHandle}
+# print(users)
+# route = {"chat" : chatHandle , "callback_query" : callbackHandle , "inline_query" : inlineHandle}
 
 bot = telepot.Bot("496707997:AAFj9FxEqElLU7jcOlQ_DJMilo2jG8_e5Kc")
 bot.message_loop(handle)
 
-while 1 :
+while 1:
     time.sleep(1)

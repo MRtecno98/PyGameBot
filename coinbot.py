@@ -1,5 +1,5 @@
-import telepot , time , random , emoji , pprint , json , os
-from telepot.namedtuple import InlineKeyboardButton , InlineKeyboardMarkup
+import telepot, time, random, emoji, pprint, json, os
+from telepot.namedtuple import InlineKeyboardButton, InlineKeyboardMarkup
 
 action = None
 

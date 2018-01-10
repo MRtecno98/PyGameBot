@@ -1,0 +1,1 @@
+gamebot: python "coinbot.py"

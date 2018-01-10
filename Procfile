@@ -1,1 +1,1 @@
-gamebot: python "coinbot.py"
+gamebot: python coinbot.py

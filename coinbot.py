@@ -1,12 +1,13 @@
-import telepot, time, random, emoji, pprint, json, os
-from telepot.namedtuple import InlineKeyboardButton, InlineKeyboardMarkup
+import telepot, time , random , emoji , pprint , json , os
+from telepot.namedtuple \
+    import InlineKeyboardButton, InlineKeyboardMarkup
 
 action = None
 
 users = {}
 
 
-def create_new_user(chatid:int, msgID:int, name:str, sec_name:str = None, username:str = None, money:int = 0):
+def create_new_user(chatid: int, msgID: int, name: str, sec_name: str = None, username: str = None, money: int = 0, gevs: int = 5) :
     global users
     obj = {}
     obj["msg"] = msgID
@@ -14,17 +15,18 @@ def create_new_user(chatid:int, msgID:int, name:str, sec_name:str = None, userna
     obj["second_name"] = sec_name
     obj["username"] = username
     obj["money"] = money
+    obj["gevs"] = gevs
     users[int(chatid)] = obj
 
 
-def save_users():
+def save_users() :
     global users
     # print("Saving users...")
     with open(r".\accounts.json" , "w") as file:
         file.write(json.dumps(users))
 
 
-def load_users():
+def load_users() :
     global users
     # print("Loading users...")
     if os.path.isfile(r".\accounts.json"):
@@ -53,7 +55,7 @@ def send_and_log(chatid,
     return msg_id
 
 
-def chat_handle(msg):
+def chat_handle(msg) :
     global action
     global users
     # loadUsers()
@@ -70,8 +72,8 @@ def chat_handle(msg):
                   InlineKeyboardButton(text="📟 Classifica 📟", callback_data="leaderboard")],
                  [InlineKeyboardButton(text="🤖 Info sul bot 🤖", callback_data="info")]
             ])
-            msg_id = send_and_log(chatid, "***Benvenuto su pyGameBot! Il primo bot Telegram di mini-giochi!***"
-                                          "\n\n``` + '\t'*12 + Bot Sviluppato da @MRtecno98```",
+            msg_id = send_and_log(chatid, "***Benvenuto su pyGameBot! Il primo bot Telegram di mini-giochi!***" +
+                                          "\n\n```" + '\t'*12 + "Bot Sviluppato da @MRtecno98```",
                                   parse_mode='Markdown',
                                   reply_markup=keyboard)
 
@@ -93,7 +95,7 @@ def chat_handle(msg):
     return
 
 
-def callback_handle(msg):
+def callback_handle(msg) :
     global action
     global users
     # print(users)
@@ -127,10 +129,9 @@ def callback_handle(msg):
                 InlineKeyboardButton(text="📟 Classifica 📟", callback_data="leaderboard")],
                 [InlineKeyboardButton(text="🤖 Info sul bot 🤖", callback_data="info")]
             ])
-            bot.editMessageText((from_id, users[from_id]["msg"]),"***Benvenuto su pyGameBot! "
-                                                                 "Il primo bot Telegram di mini-giochi!***\n\n```"
-                                                                 "\t\t\t\t\t\t\t\t\t\tBot Sviluppato da @MRtecno98```"
-                                                                 "",
+            bot.editMessageText((from_id, users[from_id]["msg"]),
+                                "***Benvenuto su pyGameBot! Il primo bot Telegram di mini-giochi!***" +
+                                "\n\n```" + '\t'*12 + "Bot Sviluppato da @MRtecno98```",
                                 reply_markup=keyboard,
                                 parse_mode="Markdown")
             return
@@ -199,7 +200,7 @@ def callback_handle(msg):
             ai = random.randint(1,3)
             if (ai == 1 and ogg == "paper") or (ai == 2 and ogg == "forb") or (ai == 3 and ogg == "rock") :
                 text = "***Hai Vinto!***\n___1 Punto è stato aggiunto al tuo conto___"
-                points+=1
+                points += 1
             if (ai == 1 and ogg == "rock") or (ai == 2 and ogg == "paper") or (ai == 3 and ogg == "forb") :
                 text = "***Pareggio***"
             if (ai == 1 and ogg == "forb") or (ai == 2 and ogg == "rock") and (ai == 3 and ogg == "paper") :
@@ -222,7 +223,7 @@ def callback_handle(msg):
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Sasso", callback_data='scf:{"obj":"rock" , "points":0 , "count":' + str(count+1) + '}'),
                  InlineKeyboardButton(text="Carta", callback_data='scf:{"obj":"paper" , "points":0, "count":' + str(count+1) + '}'),
-                 InlineKeyboardButton(text="Forbice", callback_data='scf:{"obj":"forb" , "points":0, "count":' + str(count+1) + '}'),],
+                 InlineKeyboardButton(text="Forbice", callback_data='scf:{"obj":"forb" , "points":0, "count":' + str(count+1) + '}')],
                 [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
 
@@ -248,6 +249,19 @@ def callback_handle(msg):
             return
 
         if data == "geva":
+            if users[from_id]["gevs"] <= 0 :
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Shop", callback_data="shop")],
+                    [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
+                ])
+                bot.editMessageText((from_id , users[from_id]["msg"]),
+                                    "Mi dispiace, per oggi hai terminato tutti i tuoi Gratta & Vinci"
+                                    "\n\n                         ***Puoi comprarne altri allo Shop!***",
+                                    parse_mode="Markdown",
+                                    reply_markup=keyboard
+                                    )
+                return
+            users[from_id]["gevs"] -= 1
             n1 = random.randint(0,10)
             n2 = random.randint(0, 10)
             add = 0
@@ -261,6 +275,8 @@ def callback_handle(msg):
                 [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
             bot.editMessageText((from_id, users[from_id]["msg"]),
+                                "Gratta&Vinci rimanenti per oggi: "
+                                + str(users[from_id]["gevs"]) + "\n" +
                                 "Numero 1: " + str(n1) + "\n"
                                 "Numero 2: " + str(n2) + "\n"
                                 + is_valid,
@@ -283,7 +299,7 @@ def callback_handle(msg):
         print("", end='')
 
 
-def inline_handle(msg):
+def inline_handle(msg) :
     global action
     global users
     # loadUsers()
@@ -295,7 +311,7 @@ def inline_handle(msg):
         print("", end='')
 
 
-def handle(msg):
+def handle(msg) :
     global users
     load_users()
     try :

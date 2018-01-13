@@ -1,7 +1,8 @@
-﻿import telepot, time, random, emoji, pprint, json, os, sys , schedule
+﻿import telepot, time, random, emoji, pprint, json, os, sys , schedule, requests
 from telepot.namedtuple \
     import InlineKeyboardButton, InlineKeyboardMarkup
 
+urltoken = "http://database98.altervista.org/Bots/pygamebot/token.txt"
 action = None
 
 users = {}
@@ -342,7 +343,10 @@ def update_gevs():
 # print(users)
 # route = {"chat" : chatHandle , "callback_query" : callbackHandle , "inline_query" : inlineHandle}
 
-bot = telepot.Bot(sys.argv[1])
+request = requests.get(urltoken)
+request.raise_for_status()
+
+bot = telepot.Bot(request.text)
 edit_message = bot.editMessageText
 bot.editMessageText = edit_and_log
 bot.message_loop(handle)

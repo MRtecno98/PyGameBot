@@ -2,3 +2,4 @@ telepot
 emoji
 pprint
 schedule
+requests

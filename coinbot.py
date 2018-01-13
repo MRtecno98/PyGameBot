@@ -1,18 +1,19 @@
-﻿import telepot, time , random , emoji , pprint , json , os , sys
+﻿import telepot, time, random, emoji, pprint, json, os, sys , schedule
 from telepot.namedtuple \
     import InlineKeyboardButton, InlineKeyboardMarkup
 
 action = None
 
 users = {}
+admins = [144218415]
 
 
-def edit_and_log(msg_identifier , text , parse_mode=None , disable_web_page_preview=None , reply_markup=None) :
-    edit_message(msg_identifier , text , parse_mode=parse_mode , disable_web_page_preview=disable_web_page_preview , reply_markup=reply_markup)
-    print("#" + str(action) + " " + str(msg_identifier[0]) + " Edit message: " + text.replace("\n" , "").replace("\t" , ""))
+def edit_and_log(msg_identifier, text, parse_mode=None, disable_web_page_preview=None, reply_markup=None):
+    edit_message(msg_identifier, text, parse_mode=parse_mode, disable_web_page_preview=disable_web_page_preview , reply_markup=reply_markup)
+    print("#" + str(action) + " " + str(msg_identifier[0]) + " Edit message: " + text.replace("\n", "").replace("\t", ""))
 
 
-def create_new_user(chatid: int, msgID: int, name: str, sec_name: str = None, username: str = None, money: int = 0, gevs: int = 5) :
+def create_new_user(chatid: int, msgID: int, name: str, sec_name: str = None, username: str = None, money: int = 0, gevs: int = 5):
     global users
     obj = {}
     obj["msg"] = msgID
@@ -24,18 +25,18 @@ def create_new_user(chatid: int, msgID: int, name: str, sec_name: str = None, us
     users[int(chatid)] = obj
 
 
-def save_users() :
+def save_users():
     global users
     # print("Saving users...")
-    with open(r".\accounts.json" , "w") as file:
+    with open(r".\accounts.json", "w") as file:
         file.write(json.dumps(users))
 
 
-def load_users() :
+def load_users():
     global users
     # print("Loading users...")
     if os.path.isfile(r".\accounts.json"):
-        with open(r".\accounts.json" , "r") as file:
+        with open(r".\accounts.json", "r") as file:
             users = json.loads(file.read())
     else:
         users = {}
@@ -60,13 +61,13 @@ def send_and_log(chatid,
     return msg_id
 
 
-def chat_handle(msg) :
+def chat_handle(msg):
     global action
     global users
     # loadUsers()
-    try :
-        pprint.pprint(msg)
-        action = random.randint(0,99999)
+    try:
+        # pprint.pprint(msg)
+        action = random.randint(0, 99999)
         content_type, chat_type, chatid, msg_date, msg_id = telepot.glance(msg, flavor='chat', long=True)
         text = msg["text"].replace("/", "")
 
@@ -92,7 +93,8 @@ def chat_handle(msg) :
             except KeyError:
                 surname = None
 
-            create_new_user(chatid, msg_id["message_id"], msg["from"]["first_name"], surname, username)
+            if chatid not in list(users.keys()):
+                create_new_user(chatid, msg_id["message_id"], msg["from"]["first_name"], surname, username)
     finally:
         # saveUsers()
         print("", end='')
@@ -100,23 +102,23 @@ def chat_handle(msg) :
     return
 
 
-def callback_handle(msg) :
+def callback_handle(msg):
     global action
     global users
     # print(users)
     # loadUsers()
-    try :
+    try:
         action = random.randint(0, 99999)
         callback_id, from_id, data = telepot.glance(msg, flavor="callback_query")
         from_id = str(from_id)
         if data == "profile":
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="↩ Torna al menu" , callback_data="menu")]
+                [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
             # print(users[from_id]["msg"])
             message = ""
-            message+="***Profilo di: " + users[from_id]["name"] + "***\n"
-            message+="👱" + "Name: " + users[from_id]["name"] + "\n"
+            message += "***Profilo di: " + users[from_id]["name"] + "***\n"
+            message += "👱" + "Name: " + users[from_id]["name"] + "\n"
             if users[from_id]["second_name"] is not None: message += "👪" + " Second Name: " \
                                                                      + users[from_id]["second_name"] + "\n"
             if users[from_id]["username"] is not None: message += "🌐" + " Username: " + \
@@ -131,7 +133,7 @@ def callback_handle(msg) :
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="🕹 Gioca! 🕹", callback_data="play")],
                 [InlineKeyboardButton(text="👾 Profilo 👾", callback_data="profile"),
-                InlineKeyboardButton(text="📟 Classifica 📟", callback_data="leaderboard")],
+                 InlineKeyboardButton(text="📟 Classifica 📟", callback_data="leaderboard")],
                 [InlineKeyboardButton(text="🤖 Info sul bot 🤖", callback_data="info")]
             ])
             bot.editMessageText((from_id, users[from_id]["msg"]),
@@ -144,9 +146,9 @@ def callback_handle(msg) :
         if data == "info":
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Sviluppatore Bot", url="http://bit.ly/subscribemrtecno")],
-                [InlineKeyboardButton(text="↩ Torna al menu" , callback_data="menu")]
+                [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
-            bot.editMessageText((from_id , users[from_id]["msg"]),
+            bot.editMessageText((from_id, users[from_id]["msg"]),
                                 "Bot sviluppato da @MRtecno98\nCopyright 2017 MRtecno98, All Rights Reserved",
                                 reply_markup=keyboard)
             return
@@ -171,7 +173,7 @@ def callback_handle(msg) :
 
         if data == "play":
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="Sasso Carta Forbice", callback_data="scf") , InlineKeyboardButton(text="Gratta e Vinci", callback_data="gev")],
+                [InlineKeyboardButton(text="Sasso Carta Forbice", callback_data="scf"), InlineKeyboardButton(text="Gratta e Vinci", callback_data="gev")],
                 [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
             bot.editMessageText((from_id, users[from_id]["msg"]),
@@ -185,7 +187,7 @@ def callback_handle(msg) :
                 [InlineKeyboardButton(text="Sasso", callback_data='scf:{"obj":"rock" , "points":0 , "count":0}'),
                  InlineKeyboardButton(text="Carta", callback_data='scf:{"obj":"paper" , "points":0 , "count":0}'),
                  InlineKeyboardButton(text="Forbice", callback_data='scf:{"obj":"forb" , "points":0 , "count":0}')],
-                [InlineKeyboardButton(text="↩ Torna al menu" , callback_data="menu")]
+                [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
             ])
             bot.editMessageText((from_id, users[from_id]["msg"]),
                                 "***Benvenuto su Sasso Carta Fobice, seleziona un oggetto per cominciare!***",
@@ -193,7 +195,7 @@ def callback_handle(msg) :
                                 parse_mode="Markdown")
             return
 
-        if data.startswith("scf:") :
+        if data.startswith("scf:"):
             newData = data[4:]
             obj = json.loads(newData)
             text = ""
@@ -202,13 +204,13 @@ def callback_handle(msg) :
             count = obj["count"]
             aiobj = ""
             plobj = ""
-            ai = random.randint(1,3)
-            if (ai == 1 and ogg == "paper") or (ai == 2 and ogg == "forb") or (ai == 3 and ogg == "rock") :
+            ai = random.randint(1, 3)
+            if (ai == 1 and ogg == "paper") or (ai == 2 and ogg == "forb") or (ai == 3 and ogg == "rock"):
                 text = "***Hai Vinto!***\n___1 Punto è stato aggiunto al tuo conto___"
                 points += 1
-            if (ai == 1 and ogg == "rock") or (ai == 2 and ogg == "paper") or (ai == 3 and ogg == "forb") :
+            if (ai == 1 and ogg == "rock") or (ai == 2 and ogg == "paper") or (ai == 3 and ogg == "forb"):
                 text = "***Pareggio***"
-            if (ai == 1 and ogg == "forb") or (ai == 2 and ogg == "rock") and (ai == 3 and ogg == "paper") :
+            if (ai == 1 and ogg == "forb") or (ai == 2 and ogg == "rock") and (ai == 3 and ogg == "paper"):
                 text = "***Hai Perso!***"
 
             if ai == 1:
@@ -238,7 +240,7 @@ def callback_handle(msg) :
                                 parse_mode='Markdown',
                                 reply_markup=keyboard)
 
-            users[from_id]["money"]+=points
+            users[from_id]["money"] += points
             return
 
         if data == "gev":
@@ -255,20 +257,20 @@ def callback_handle(msg) :
             return
 
         if data == "geva":
-            if users[from_id]["gevs"] <= 0 :
+            if users[from_id]["gevs"] <= 0:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
                     [InlineKeyboardButton(text="Shop", callback_data="shop")],
                     [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
                 ])
-                bot.editMessageText((from_id , users[from_id]["msg"]),
+                bot.editMessageText((from_id, users[from_id]["msg"]),
                                     "Mi dispiace, per oggi hai terminato tutti i tuoi Gratta & Vinci"
                                     "\n\n                         ***Puoi comprarne altri allo Shop!***",
                                     parse_mode="Markdown",
                                     reply_markup=keyboard
-                                   )
+                                    )
                 return
             users[from_id]["gevs"] -= 1
-            n1 = random.randint(0,10)
+            n1 = random.randint(0, 10)
             n2 = random.randint(0, 10)
             add = 0
             if n1 == n2:
@@ -305,7 +307,7 @@ def callback_handle(msg) :
         print("", end='')
 
 
-def inline_handle(msg) :
+def inline_handle(msg):
     global action
     global users
     # loadUsers()
@@ -317,10 +319,10 @@ def inline_handle(msg) :
         print("", end='')
 
 
-def handle(msg) :
+def handle(msg):
     global users
     load_users()
-    try :
+    try:
         f = telepot.flavor(msg)
         if f == "chat":
             chat_handle(msg)
@@ -332,6 +334,11 @@ def handle(msg) :
         save_users()
 
 
+def update_gevs():
+    for user in list(users.keys()):
+        users[user]["gevs"] = 5
+
+
 # print(users)
 # route = {"chat" : chatHandle , "callback_query" : callbackHandle , "inline_query" : inlineHandle}
 
@@ -340,5 +347,9 @@ edit_message = bot.editMessageText
 bot.editMessageText = edit_and_log
 bot.message_loop(handle)
 
-while 1:
+update_gevs()
+schedule.every().day.do(update_gevs)
+
+while True:
+    schedule.run_pending()
     time.sleep(1)

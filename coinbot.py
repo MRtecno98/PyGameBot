@@ -1,4 +1,4 @@
-import telepot, time , random , emoji , pprint , json , os
+﻿import telepot, time , random , emoji , pprint , json , os
 from telepot.namedtuple \
     import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -259,7 +259,7 @@ def callback_handle(msg) :
                                     "\n\n                         ***Puoi comprarne altri allo Shop!***",
                                     parse_mode="Markdown",
                                     reply_markup=keyboard
-                                    )
+                                   )
                 return
             users[from_id]["gevs"] -= 1
             n1 = random.randint(0,10)
@@ -329,7 +329,7 @@ def handle(msg) :
 # print(users)
 # route = {"chat" : chatHandle , "callback_query" : callbackHandle , "inline_query" : inlineHandle}
 
-bot = telepot.Bot("496707997:AAFj9FxEqElLU7jcOlQ_DJMilo2jG8_e5Kc")
+bot = telepot.Bot("496707997:AAHkkKr5MIoco2Tn7Mp9c_K3V93waH_tre0")
 bot.message_loop(handle)
 
 while 1:

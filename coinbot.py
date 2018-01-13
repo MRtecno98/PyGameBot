@@ -1,10 +1,15 @@
-﻿import telepot, time , random , emoji , pprint , json , os
+﻿import telepot, time , random , emoji , pprint , json , os , sys
 from telepot.namedtuple \
     import InlineKeyboardButton, InlineKeyboardMarkup
 
 action = None
 
 users = {}
+
+
+def edit_and_log(msg_identifier , text , parse_mode=None , disable_web_page_preview=None , reply_markup=None) :
+    edit_message(msg_identifier , text , parse_mode=parse_mode , disable_web_page_preview=disable_web_page_preview , reply_markup=reply_markup)
+    print("#" + str(action) + " " + str(msg_identifier[0]) + " Edit message: " + text.replace("\n" , "").replace("\t" , ""))
 
 
 def create_new_user(chatid: int, msgID: int, name: str, sec_name: str = None, username: str = None, money: int = 0, gevs: int = 5) :
@@ -237,6 +242,7 @@ def callback_handle(msg) :
             return
 
         if data == "gev":
+
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="Gratta!", callback_data="geva")],
                 [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
@@ -329,7 +335,9 @@ def handle(msg) :
 # print(users)
 # route = {"chat" : chatHandle , "callback_query" : callbackHandle , "inline_query" : inlineHandle}
 
-bot = telepot.Bot("496707997:AAHkkKr5MIoco2Tn7Mp9c_K3V93waH_tre0")
+bot = telepot.Bot(sys.argv[1])
+edit_message = bot.editMessageText
+bot.editMessageText = edit_and_log
 bot.message_loop(handle)
 
 while 1:

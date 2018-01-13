@@ -1,1 +1,1 @@
-gamebot: python coinbot.py
+gamebot: python coinbot.py 496707997:AAHkkKr5MIoco2Tn7Mp9c_K3V93waH_tre0

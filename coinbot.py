@@ -294,6 +294,22 @@ def callback_handle(msg):
             users[from_id]["money"] += add
             return
 
+        if data == "shop" :
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="Gratta&Vinci (10💎)",
+                                      callback_data='shop:{"object":"gev", "pay":10 , "quantity":1}')]
+                [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
+            ])
+            bot.editMessageText((from_id, users[from_id]["msg"]),
+                                "Benvenuto nello ***Shop!***"
+                                "\nQui potrai acquistare vari oggetti utili usando le tue gemme"
+                                "\n\n___Seleziona l'articolo da acquistare:___",
+                                reply_markup=keyboard,
+                                parse_mode="Markdown")
+
+        if data.startswith("shop:") :
+            date = json.loads(data[5:])
+
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="↩ Torna al menu", callback_data="menu")]
         ])
